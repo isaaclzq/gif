@@ -2,23 +2,33 @@ package com.example.pixdev32.myapplication;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.ImageView;
+import android.support.v7.widget.AppCompatImageView;
 
 import java.io.InputStream;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by pixdev32 on 3/5/18.
  */
 
-public class GifImageViewBase extends ImageView {
+public class GifImageViewBase extends AppCompatImageView {
 
-    private boolean mIsPlayingGif = false;
+    private boolean mIsPlayingGif = true;
     private GifUtils mGifUtils;
     private Bitmap mTmpBitmap;
+    private HandlerThread localThread;
+    private Handler localHandler;
+    private Looper localLooper;
     private Runnable gifRunnable = new Runnable() {
         //        @Override
         public void run() {
@@ -32,13 +42,11 @@ public class GifImageViewBase extends ImageView {
                     mTmpBitmap = mGifUtils.getFrame(i);
                     int t = mGifUtils.getDelay(i);
                     mHandler.post(mUpdateResults);
-                    try {
-                        if (t >= 0) {
-                            Thread.sleep(t);
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep(t);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
                 if (ntimes != 0) {
                     repetitionCounter++;
@@ -49,12 +57,15 @@ public class GifImageViewBase extends ImageView {
     };
     private Thread mGifThread;
 
+    // main thread handler
     final Handler mHandler = new Handler();
 
+    // update
     final Runnable mUpdateResults = new Runnable() {
         public void run() {
             if (mTmpBitmap != null && !mTmpBitmap.isRecycled()) {
                 GifImageViewBase.this.setImageBitmap(mTmpBitmap);
+                postInvalidate();
             }
         }
     };
@@ -82,19 +93,60 @@ public class GifImageViewBase extends ImageView {
 //        }
     }
 
-    public void startGif(InputStream stream) {
+    private void initLocalThread() {
 
-        if (mGifThread != null) {
-            stopRendering();
-            stopGifThread();
-        } else {
-            mGifUtils = new GifUtils();
+        if (localThread != null) {
+            localThread.quit();
+            localThread = null;
+            localLooper = null;
+            localHandler = null;
         }
 
+        localThread = new HandlerThread("gif" + UUID.randomUUID());
+        localThread.start();
+        localLooper = localThread.getLooper();
+        localHandler = new Handler(localLooper);
 
+        if (mGifUtils == null) {
+            mGifUtils = new GifUtils();
+        }
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        final int n = mGifUtils.getFrameCount();
+        final int ntimes = mGifUtils.getLoopCount();
+        int repetitionCounter = 0;
+        do {
+            for (int i = 0; i < n; i++) {
+                mTmpBitmap = mGifUtils.getFrame(i);
+                int t = mGifUtils.getDelay(i);
+                setBackgroundDrawable(new BitmapDrawable(getResources(), mTmpBitmap));
+                invalidate();
+            }
+            if (ntimes != 0) {
+                repetitionCounter++;
+            }
+        } while (mIsPlayingGif && (repetitionCounter <= ntimes));
+    }
+
+    public void startGif(InputStream stream) {
+
+//        if (mGifThread != null) {
+//            stopRendering();
+//            stopGifThread();
+//        } else {
+//            mGifUtils = new GifUtils();
+//        }
+
+        initLocalThread();
+//
+//
         mGifUtils.read(stream);
-        mIsPlayingGif = true;
-        mGifThread = new Thread(gifRunnable);
+//        mHandler.post(gifRunnable);
+//        mIsPlayingGif = true;
+//        mGifThread = new Thread(gifRunnable);
 //        mGifThread = new Thread(new Runnable() {
 //            public void run() {
 //                final int n = mGifUtils.getFrameCount();
@@ -117,7 +169,8 @@ public class GifImageViewBase extends ImageView {
 //                } while (mIsPlayingGif && (repetitionCounter <= ntimes));
 //            }
 //        });
-        mGifThread.start();
+//        mGifThread.start();
+
     }
 
     //    public void startRendering() {

@@ -1,10 +1,13 @@
 package com.example.pixdev32.myapplication;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,10 +25,23 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
 
     private List<Integer> mList;
     private Context mContext;
+    private HandlerThread mHandlerThread;
+    private Handler mHandler;
+    private Looper mLooper;
+
+    private LruCache<Integer, InputStream> mCache;
 
     public GifAdapter(Context context, List list) {
         mContext = context;
         mList = list;
+
+        mCache = initCache();
+//        initThread();
+    }
+
+    private LruCache initCache() {
+        int size = 10 * 1024 * 1024;
+        return new LruCache<>(size);
     }
 
     @NonNull
@@ -36,16 +52,30 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GifViewHolder holder, int position) {
-        int str = mList.get(position);
+    public void onBindViewHolder(@NonNull final GifViewHolder holder, int position) {
+        final int str = mList.get(position);
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                holder.bind(str);
+//            }
+//        });
         holder.bind(str);
     }
 
-    @Override
-    public void onViewDetachedFromWindow(@NonNull GifViewHolder holder) {
-        Log.v("adapter", "onDetach");
-        super.onViewDetachedFromWindow(holder);
+    private void initThread() {
+        mHandlerThread = new HandlerThread("gif");
+        mHandlerThread.start();
+        mLooper = mHandlerThread.getLooper();
+        mHandler = new Handler(mLooper);
     }
+
+//    @Override
+//    public void onViewDetachedFromWindow(@NonNull GifViewHolder holder) {
+//        Log.v("adapter", "onDetach");
+//        holder.stop();
+//        super.onViewDetachedFromWindow(holder);
+//    }
 
     @Override
     public int getItemCount() {
@@ -55,9 +85,7 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
     public class GifViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.img_gif7)
-        GifImageViewBase mGif7;
-
-        AsyncTask asyncTask;
+        GifImageview mGif7;
 
         public GifViewHolder(View itemView) {
             super(itemView);
@@ -66,30 +94,15 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
 
         public void bind(Integer str) {
             Log.v("adapter", "onbind");
-            if (asyncTask != null) {
-                asyncTask.cancel(true);
-            }
-            asyncTask = new GifAsync().execute(str);
+//            InputStream is = mContext.getResources().openRawResource(+str);
+//            mGif7.startGif(is);
+            mGif7.setCache(mCache);
+            mGif7.setGifImageResource(str);
         }
 
-        public void stop() {
-            mGif7.stopRendering();
-            mGif7.stopGifThread();
-        }
-
-        public class GifAsync extends AsyncTask<Integer, Void, Void> {
-
-            @Override
-            protected Void doInBackground(Integer... integers) {
-                if (!isCancelled()) {
-                    int drawable = integers[0];
-                    InputStream is = mContext.getResources().openRawResource(+drawable);
-                    mGif7.startGif(is);
-                }
-                return null;
-            }
-        }
+//        public void stop() {
+//            mGif7.stopRendering();
+//            mGif7.stopGifThread();
+//        }
     }
-
-
 }

@@ -4,15 +4,22 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.annotation.RawRes;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
-import android.widget.Toast;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
 
 /**
  * Created by pixdev32 on 3/5/18.
@@ -25,6 +32,11 @@ public class GifImageview extends View {
     private int mWidth, mHeight;
     private long mStart;
     private Context mContext;
+    private HandlerThread mGifThread;
+    private Handler mGifHandler;
+    private Looper mGifLooper;
+
+    private LruCache<Integer, Movie> mCache;
 
     public GifImageview(Context context) {
         super(context);
@@ -42,26 +54,29 @@ public class GifImageview extends View {
             int id = Integer.parseInt(attrs.getAttributeValue(1).substring(1));
             setGifImageResource(id);
         }
+        mGifThread = new HandlerThread("Gif" + UUID.randomUUID());
+        mGifThread.start();
+        mGifLooper = mGifThread.getLooper();
+        mGifHandler = new Handler(mGifLooper);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        setMeasuredDimension(Math.max(getSuggestedMinimumWidth(), getWidth()),
-                             Math.max(getSuggestedMinimumHeight(), getHeight()));
+        setMeasuredDimension(Math.max(getSuggestedMinimumWidth(), 900),
+                             Math.max(getSuggestedMinimumHeight(), 900));
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.i("onDraw", "drawing");
         long now = SystemClock.uptimeMillis();
-        canvas.scale((float)this.getWidth() / (float)mMovie.width(),(float)this.getHeight() /      (float)mMovie.height());
 
         if (mStart == 0) {
             mStart = now;
         }
 
         if (mMovie != null) {
+            canvas.scale((float)this.getWidth() / (float)mMovie.width(),(float)this.getHeight() /      (float)mMovie.height());
             int duration = mMovie.duration();
             if (duration == 0) {
                 duration = 1000;
@@ -76,26 +91,61 @@ public class GifImageview extends View {
         }
     }
 
-    public void setGifImageResource(int id) {
-        mInputStream = mContext.getResources().openRawResource(id);
-        init();
+    public void setCache(LruCache cache) {
+        mCache = cache;
     }
 
-    public void setGifImageUri(Uri uri) {
-        try {
-            mInputStream = mContext.getContentResolver().openInputStream(uri);
-            init();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void setGifImageResource(final int resId) {
+        mGifHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mMovie = mCache.get(resId);
+
+                if (mMovie == null) {
+                    mInputStream = mContext.getResources().openRawResource(resId);
+                    mMovie = Movie.decodeStream(mInputStream);
+                    mCache.put(resId, mMovie);
+                    try {
+                        mInputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                mWidth = mMovie.width();
+                mHeight = mMovie.height();
+                postInvalidate();
+            }
+        });
     }
 
-    private void init() {
-        setFocusable(true);
-        mMovie = Movie.decodeStream(mInputStream);
-        mWidth = mMovie.width();
-        mHeight = mMovie.height();
+    public void setGifImageUri(final String uri) {
+        mGifHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL gifUrl = new URL(uri);
+                    HttpURLConnection conn = (HttpURLConnection) gifUrl.openConnection();
+                    conn.setConnectTimeout(5000);
+                    mInputStream = conn.getInputStream();
+                    mMovie = Movie.decodeStream(mInputStream);
+                    mWidth = mMovie.width();
+                    mHeight = mMovie.height();
+                    postInvalidate();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
-        requestLayout();
+
+//        try {
+//            mInputStream = mContext.getContentResolver().openInputStream(uri);
+//            init(id);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 }

@@ -46,24 +46,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-        gifList = new ArrayList<>();
+        gifList = new ArrayList<Integer>();
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.tiger);
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
         gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
         gifList.add(R.drawable.shop);
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
 
         GifAdapter adapter = new GifAdapter(this, gifList);
         mRecycler.setAdapter(adapter);
@@ -73,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
 //        initViewWithCustomView();
 //        initViewWithGlide();
+    }
+
+    private RecyclerView.Adapter getAdapterForLocalGif() {
+
     }
 
 
