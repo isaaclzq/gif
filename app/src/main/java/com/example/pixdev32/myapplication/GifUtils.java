@@ -55,6 +55,7 @@ public class GifUtils {
 
     private static class GifFrame {
         public GifFrame(Bitmap im, int del) {
+//            image = Bitmap.createScaledBitmap(im, im.getWidth()/2, im.getHeight()/2, false);
             image = im;
             delay = del;
         }
@@ -68,8 +69,6 @@ public class GifUtils {
         delay = -1;
         if ((n >= 0) && (n < frameCount)) {
             delay = frames.elementAt(n).delay;
-        } else {
-            Log.v("aldsfj", "a;sdfjasdf");
         }
         return delay;
     }

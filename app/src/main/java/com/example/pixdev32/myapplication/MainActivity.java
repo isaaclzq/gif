@@ -4,7 +4,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import java.util.ArrayList;
+import android.util.LruCache;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView mRecycler;
 
     private Unbinder mUnbinder;
-    private ArrayList<Integer> gifList;
+    private List<Integer> gifList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,35 +50,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-        gifList = new ArrayList<>();
-//        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
-//        gifList.add(R.drawable.clap);
-//        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
-        gifList.add(R.drawable.clap);
+        gifList = new LinkedList<>();
         gifList.add(R.drawable.shop);
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.clap);
-//        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.clap);
-//        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.clap);
-//        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.clap);
 
         GifAdapter adapter = new GifAdapter(this, gifList);
         mRecycler.setAdapter(adapter);
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-//        initViewWithGifDecoder();
-
-//        initViewWithCustomView();
-//        initViewWithGlide();
     }
-
 
 
 //    private void initViewWithCustomView() {
