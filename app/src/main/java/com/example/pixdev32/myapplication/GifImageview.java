@@ -1,24 +1,35 @@
 package com.example.pixdev32.myapplication;
 
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.annotation.RawRes;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.LruCache;
 import android.view.View;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.UUID;
 
 /**
@@ -35,8 +46,10 @@ public class GifImageview extends View {
     private HandlerThread mGifThread;
     private Handler mGifHandler;
     private Looper mGifLooper;
+    private AsyncTask mAsync;
 
-    private LruCache<Integer, Movie> mCache;
+    private LruCache<String, Movie> mCache;
+    private String gifUrl;
 
     public GifImageview(Context context) {
         super(context);
@@ -64,7 +77,7 @@ public class GifImageview extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         setMeasuredDimension(Math.max(getSuggestedMinimumWidth(), 900),
-                             Math.max(getSuggestedMinimumHeight(), 900));
+                Math.max(getSuggestedMinimumHeight(), 900));
     }
 
     @Override
@@ -76,7 +89,7 @@ public class GifImageview extends View {
         }
 
         if (mMovie != null) {
-            canvas.scale((float)this.getWidth() / (float)mMovie.width(),(float)this.getHeight() /      (float)mMovie.height());
+            canvas.scale((float) this.getWidth() / (float) mMovie.width(), (float) this.getHeight() / (float) mMovie.height());
             int duration = mMovie.duration();
             if (duration == 0) {
                 duration = 1000;
@@ -96,56 +109,138 @@ public class GifImageview extends View {
     }
 
     public void setGifImageResource(final int resId) {
-        mGifHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mMovie = mCache.get(resId);
-
-                if (mMovie == null) {
-                    mInputStream = mContext.getResources().openRawResource(resId);
-                    mMovie = Movie.decodeStream(mInputStream);
-                    mCache.put(resId, mMovie);
-                    try {
-                        mInputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                mWidth = mMovie.width();
-                mHeight = mMovie.height();
-                postInvalidate();
-            }
-        });
+//        mGifHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                mMovie = mCache.get(resId);
+//
+//                if (mMovie == null) {
+//                    mInputStream = mContext.getResources().openRawResource(resId);
+//                    mMovie = Movie.decodeStream(mInputStream);
+//                    mCache.put(resId, mMovie);
+//                    try {
+//                        mInputStream.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                mWidth = mMovie.width();
+//                mHeight = mMovie.height();
+//                postInvalidate();
+//            }
+//        });
     }
 
     public void setGifImageUri(final String uri) {
-        mGifHandler.post(new Runnable() {
-            @Override
-            public void run() {
+        if (mAsync != null) {
+            mAsync.cancel(true);
+        }
+        mAsync = new GifAsync().execute(uri);
+    }
+
+    class GifAsync extends AsyncTask<String, Void, Void> {
+
+        private OutputStream mOutput = null;
+        private HttpURLConnection mConnection = null;
+        private InputStream mInputStream = null;
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            invalidate();
+            super.onPostExecute(aVoid);
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (mOutput != null) {
                 try {
-                    URL gifUrl = new URL(uri);
-                    HttpURLConnection conn = (HttpURLConnection) gifUrl.openConnection();
-                    conn.setConnectTimeout(5000);
-                    mInputStream = conn.getInputStream();
-                    mMovie = Movie.decodeStream(mInputStream);
-                    mWidth = mMovie.width();
-                    mHeight = mMovie.height();
-                    postInvalidate();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    mOutput.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    mOutput = null;
                 }
             }
-        });
 
+            if (mInputStream != null) {
+                try {
+                    mInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    mInputStream = null;
+                }
+            }
 
-//        try {
-//            mInputStream = mContext.getContentResolver().openInputStream(uri);
-//            init(id);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
+            if (mConnection != null) {
+                mConnection.disconnect();
+                mConnection = null;
+            }
+
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String str = strings[0];
+            String filename = "1";
+            try {
+                filename = URLEncoder.encode(str, "UTF-8").replace(".", "");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            File file = null;
+            FileInputStream fis = null;
+
+            mMovie = mCache.get(filename);
+
+            if (mMovie != null) {
+                return null;
+            }
+
+            try {
+                fis = mContext.openFileInput(filename);
+                mMovie = Movie.decodeStream(fis);
+                mCache.put(filename, mMovie);
+                return null;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                URL gifUrl = new URL(str);
+                mConnection = (HttpURLConnection) gifUrl.openConnection();
+                mConnection.setConnectTimeout(5000);
+                mInputStream = mConnection.getInputStream();
+                file = new File(mContext.getCacheDir(), filename);
+                mOutput = new FileOutputStream(file);
+
+                try {
+                    byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                    int read;
+
+                    while ((read = mInputStream.read(buffer)) != -1 && !isCancelled()) {
+                        mOutput.write(buffer, 0, read);
+                    }
+
+                    if (file != null) {
+                        mMovie = Movie.decodeFile(file.getAbsolutePath());
+                        mCache.put(filename, mMovie);
+                    }
+
+                    mOutput.flush();
+                } finally {
+                    mOutput.close();
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 }
