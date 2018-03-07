@@ -23,14 +23,10 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
     private List<Integer> mList;
     private Context mContext;
 
-    private GifDecoderHandler gifDecoderHandler;
 
     public GifAdapter(Context context, List list) {
         mContext = context;
         mList = list;
-        gifDecoderHandler = new GifDecoderHandler();
-        gifDecoderHandler.start();
-        gifDecoderHandler.getLooper();
     }
 
     @NonNull
