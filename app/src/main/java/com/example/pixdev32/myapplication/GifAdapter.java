@@ -70,15 +70,6 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
                 asyncTask.cancel(true);
             }
             asyncTask = new GifAsync().execute(str);
-//            gifDecoderHandler.queueGif(this, str);
-
-//            InputStream is = mContext.getResources().openRawResource(+str);
-//            mGif7.startGif(is);
-        }
-
-        public void stop() {
-            mGif7.stopRendering();
-            mGif7.stopGifThread();
         }
 
         public class GifAsync extends AsyncTask<Integer, Void, Void> {
@@ -87,8 +78,8 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
             protected Void doInBackground(Integer... integers) {
                 if (!isCancelled()) {
                     int drawable = integers[0];
-                    InputStream is = mContext.getResources().openRawResource(+drawable);
-                    mGif7.startGif(is);
+//                    InputStream is = mContext.getResources().openRawResource(+drawable);
+                    mGif7.startGif(Integer.toString(+drawable));
                 }
                 return null;
             }

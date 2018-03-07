@@ -8,7 +8,9 @@
     android:orientation="vertical">
     <com.example.pixdev32.myapplication.GifImageViewBase
         android:id="@+id/img_gif7"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"/>
+        android:minHeight="300dp"
+        android:minWidth="300dp"/>
 </LinearLayout>
 

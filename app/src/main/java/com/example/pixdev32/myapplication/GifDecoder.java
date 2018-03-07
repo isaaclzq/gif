@@ -123,6 +123,10 @@ public class GifDecoder {
         public int bufferFrameStart;
         /* Local Color Table */
         public int[] lct;
+
+        public void clear() {
+            lct = null;
+        }
     }
 
     /**
@@ -184,6 +188,10 @@ public class GifDecoder {
         return loopCount;
     }
 
+    public void clearFrames() {
+        frames.clear();
+    }
+
     /**
      * Get the next frame in the animation sequence.
      *
@@ -226,6 +234,7 @@ public class GifDecoder {
 
         return currentImage;
     }
+
 
     /**
      * Reads GIF image from stream

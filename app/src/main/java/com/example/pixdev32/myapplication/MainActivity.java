@@ -55,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
         gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
+
 
         GifAdapter adapter = new GifAdapter(this, gifList);
         mRecycler.setAdapter(adapter);
