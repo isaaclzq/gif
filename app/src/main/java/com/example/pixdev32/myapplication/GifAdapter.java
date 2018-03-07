@@ -23,9 +23,14 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
     private List<Integer> mList;
     private Context mContext;
 
+    private GifDecoderHandler gifDecoderHandler;
+
     public GifAdapter(Context context, List list) {
         mContext = context;
         mList = list;
+        gifDecoderHandler = new GifDecoderHandler();
+        gifDecoderHandler.start();
+        gifDecoderHandler.getLooper();
     }
 
     @NonNull
@@ -58,7 +63,6 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
         GifImageViewBase mGif7;
 
         AsyncTask asyncTask;
-
         public GifViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -70,6 +74,10 @@ public class GifAdapter extends RecyclerView.Adapter<GifAdapter.GifViewHolder> {
                 asyncTask.cancel(true);
             }
             asyncTask = new GifAsync().execute(str);
+//            gifDecoderHandler.queueGif(this, str);
+
+//            InputStream is = mContext.getResources().openRawResource(+str);
+//            mGif7.startGif(is);
         }
 
         public void stop() {

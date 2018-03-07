@@ -47,11 +47,11 @@ public class MainActivity extends AppCompatActivity {
         mUnbinder = ButterKnife.bind(this);
 
         gifList = new ArrayList<>();
-        gifList.add(R.drawable.clap);
+//        gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
 //        gifList.add(R.drawable.tiger);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
+//        gifList.add(R.drawable.clap);
+//        gifList.add(R.drawable.shop);
 //        gifList.add(R.drawable.tiger);
         gifList.add(R.drawable.clap);
         gifList.add(R.drawable.shop);
