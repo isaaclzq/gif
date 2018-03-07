@@ -2,6 +2,7 @@ package com.example.pixdev32.myapplication;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.AnimationDrawable;
@@ -136,55 +137,57 @@ public class GifImageViewBase extends ImageView {
 //            stopRendering();
 //            stopGifThread();
 //            setTag(gifRunnable);
-            Log.d(TAG, "Stopping threads");
         } else {
             mGifUtils = new GifUtils();
         }
 
-//        gifDecoder = new GifDecoder();
-//        try {
-//            gifDecoder.read(stream, stream.available());
-//            frameCount = gifDecoder.getFrameCount();
-//            loopCount = gifDecoder.getLoopCount();
-//            if(gifDecoder != null){
-//                if(repetitionCounter1 <= loopCount && gifDecoder.getFrameCount() > 0){
-//                    animationDrawable = new AnimationDrawable();
-//                    for(int i = 0; i < gifDecoder.getFrameCount(); i++){
-//                        gifDecoder.advance();
-//                        Bitmap bm = gifDecoder.getNextFrame();
-//                        int t = gifDecoder.getNextDelay();
-//                        animationDrawable.addFrame(new BitmapDrawable(getResources(), bm), t);
-//                    }
-//                    GifImageViewBase.this.setImageDrawable(animationDrawable);
-//                    Log.d(TAG, "" + animationDrawable.getNumberOfFrames());
-//                    animationDrawable.start();
-//                    if(animationDrawable.isRunning()){
-//                        Log.d(TAG, "running");
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        int status = mGifUtils.read(stream);
-        animationDrawable = new AnimationDrawable();
-        for (int i = 0; i < mGifUtils.getFrameCount(); i++) {
-            mTmpBitmap = mGifUtils.getFrame(i);
-            int t = mGifUtils.getDelay(i);
-            animationDrawable.addFrame(new BitmapDrawable(getResources(), mTmpBitmap), t);
-        }
+        gifDecoder = new GifDecoder();
+        try {
+            gifDecoder.read(stream, stream.available());
+            frameCount = gifDecoder.getFrameCount();
+            loopCount = gifDecoder.getLoopCount();
+            if(gifDecoder != null){
+                if(repetitionCounter1 <= loopCount && gifDecoder.getFrameCount() > 0){
+                    animationDrawable = new AnimationDrawable();
+                    for(int i = 0; i < gifDecoder.getFrameCount(); i++){
+                        gifDecoder.advance();
+                        Bitmap bm = Bitmap.createBitmap(gifDecoder.getNextFrame());
 
-        GifImageViewBase.this.post(new Runnable() {
-            @Override
-            public void run() {
-                GifImageViewBase.this.setImageDrawable(animationDrawable);
-                Log.d(TAG, "" + animationDrawable.getNumberOfFrames());
-                animationDrawable.start();
-                if(animationDrawable.isRunning()){
-                    Log.d(TAG, "running");
+                        int t = gifDecoder.getNextDelay();
+                        animationDrawable.addFrame(new BitmapDrawable(getResources(), bm), t);
+                    }
+                    GifImageViewBase.this.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            GifImageViewBase.this.setImageDrawable(animationDrawable);
+                            animationDrawable.start();
+                        }
+                    });
                 }
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        mGifUtils.read(stream);
+//        animationDrawable = new AnimationDrawable();
+//        for (int i = 0; i < mGifUtils.getFrameCount(); i++) {
+//            mTmpBitmap = mGifUtils.getFrame(i);
+//            int t = mGifUtils.getDelay(i);
+//            animationDrawable.addFrame(new BitmapDrawable(getResources(), mTmpBitmap), t);
+//        }
+
+//        GifImageViewBase.this.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                GifImageViewBase.this.setImageDrawable(animationDrawable);
+//                animationDrawable.start();
+//                if(animationDrawable.isRunning()){
+//                    Log.d(TAG, "running");
+//                }
+//            }
+//        });
+
 //        frameCount = mGifUtils.getFrameCount();
 //        loopCount = mGifUtils.getLoopCount();
 //        Log.d(TAG, "Reading inputstream");
@@ -216,9 +219,6 @@ public class GifImageViewBase extends ImageView {
 //        mGifThread.start();
     }
 
-    //    public void startRendering() {
-//        mIsPlayingGif = true;
-////    }
     public void startRendering() {
         mGifThread.start();
     }
