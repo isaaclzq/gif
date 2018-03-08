@@ -94,7 +94,7 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
 
         }
 
-        public class GifAsync extends AsyncTask<String, Void, File> {
+        public class GifAsync extends AsyncTask<String, Void, GifDrawable> {
 
             private GifImageView view;
             private Context mContext;
@@ -106,17 +106,17 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
             }
 
             @Override
-            protected void onPostExecute(File file) {
-                try {
-                    view.setBackground(new GifDrawable(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
+            protected void onPostExecute(GifDrawable file) {
+                if (file == null) {
+                    return;
                 }
+                view.setBackground(file);
+                file.start();
                 super.onPostExecute(file);
             }
 
             @Override
-            protected File doInBackground(String... strings) {
+            protected GifDrawable doInBackground(String... strings) {
                 String str = strings[0];
                 String filename = "1";
                 try {
@@ -126,11 +126,26 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                 }
                 File file = null;
                 FileInputStream fis = null;
+                GifDrawable drawable;
+
+                drawable = GifCache.getInstance().get(filename);
+
+                if (drawable != null) {
+                    return drawable;
+                }
 
                 file = new File(mContext.getCacheDir(), filename);
 
                 if (file.exists()) {
-                    return file;
+
+                    try {
+                        drawable = new GifDrawable(file);
+                        GifCache.getInstance().put(filename, drawable);
+                        return drawable;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
                 try {
@@ -149,6 +164,9 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                             mOutput.write(buffer, 0, read);
                         }
 
+                        drawable = new GifDrawable(file);
+                        GifCache.getInstance().put(filename, drawable);
+
                         mOutput.flush();
                     } finally {
                         mOutput.close();
@@ -160,7 +178,7 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                     e.printStackTrace();
                 }
 
-                return file;
+                return drawable;
             }
 
         }
