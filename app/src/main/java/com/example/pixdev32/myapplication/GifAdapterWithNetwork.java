@@ -1,6 +1,8 @@
 package com.example.pixdev32.myapplication;
 
 import android.content.Context;
+import android.graphics.Movie;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -11,11 +13,24 @@ import android.util.LruCache;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 /**
  * Created by pixdev32 on 3/6/18.
@@ -35,13 +50,13 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
         mContext = context;
         mList = list;
 
-        mCache = initCache();
+//        mCache = initCache();
     }
 
-    private LruCache initCache() {
-        int size = 10 * 1024 * 1024;
-        return new LruCache<>(size);
-    }
+//    private LruCache initCache() {
+//        int size = 10 * 1024 * 1024;
+//        return new LruCache<>(size);
+//    }
 
     @NonNull
     @Override
@@ -64,7 +79,7 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
     public class GifViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.img_gif7)
-        GifImageview mGif7;
+        GifImageView mGif7;
 
         public GifViewHolder(View itemView) {
             super(itemView);
@@ -73,8 +88,81 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
 
         public void bind(String str) {
             Log.v("adapter", "onbind");
-            mGif7.setCache(mCache);
-            mGif7.setGifImageUri(str);
+//            mGif7.setCache(mCache);
+            new GifAsync(mContext, mGif7).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, str);
+
+
+        }
+
+        public class GifAsync extends AsyncTask<String, Void, File> {
+
+            private GifImageView view;
+            private Context mContext;
+
+            public GifAsync(Context context, GifImageView view) {
+                super();
+                this.view = view;
+                this.mContext = context;
+            }
+
+            @Override
+            protected void onPostExecute(File file) {
+                try {
+                    view.setBackground(new GifDrawable(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                super.onPostExecute(file);
+            }
+
+            @Override
+            protected File doInBackground(String... strings) {
+                String str = strings[0];
+                String filename = "1";
+                try {
+                    filename = URLEncoder.encode(str, "UTF-8").replace(".", "");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                File file = null;
+                FileInputStream fis = null;
+
+                file = new File(mContext.getCacheDir(), filename);
+
+                if (file.exists()) {
+                    return file;
+                }
+
+                try {
+                    URL gifUrl = new URL(str);
+                    HttpURLConnection mConnection = (HttpURLConnection) gifUrl.openConnection();
+                    mConnection.setConnectTimeout(5000);
+                    InputStream mInputStream = mConnection.getInputStream();
+                    file = new File(mContext.getCacheDir(), filename);
+                    OutputStream mOutput = new FileOutputStream(file);
+
+                    try {
+                        byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                        int read;
+
+                        while ((read = mInputStream.read(buffer)) != -1 && !isCancelled()) {
+                            mOutput.write(buffer, 0, read);
+                        }
+
+                        mOutput.flush();
+                    } finally {
+                        mOutput.close();
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return file;
+            }
+
         }
     }
 }
