@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView mRecycler;
 
     private Unbinder mUnbinder;
-    private ArrayList<Integer> gifList;
+    private ArrayList gifList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,36 +46,67 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-        gifList = new ArrayList<>();
-//        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
-//        gifList.add(R.drawable.clap);
-//        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-        gifList.add(R.drawable.clap);
-        gifList.add(R.drawable.shop);
-//        gifList.add(R.drawable.tiger);
 
-        GifAdapter adapter = new GifAdapter(this, gifList);
-        mRecycler.setAdapter(adapter);
+
+        mRecycler.setAdapter(getAdapterForNetworkGif());
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
 //        initViewWithGifDecoder();
 
 //        initViewWithCustomView();
 //        initViewWithGlide();
     }
 
+    private GifAdapter getAdapterForLocalGif() {
+        gifList = new ArrayList();
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
+        gifList.add(R.drawable.clap);
+        gifList.add(R.drawable.shop);
+        gifList.add(R.drawable.tiger);
+        return new GifAdapter(this, gifList);
+    }
 
+    private GifAdapterWithNetwork getAdapterForNetworkGif() {
+        gifList = new ArrayList<>();
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+
+
+        gifList.add("https://media.giphy.com/media/k2RYhEjB9THm8/giphy.gif");
+        gifList.add("https://media.giphy.com/media/S0SRH7in45I4w/giphy.gif");
+        gifList.add("https://media.giphy.com/media/DQ7UyAWFlHNVm/giphy.gif");
+        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
+        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
+        gifList.add("https://media.giphy.com/media/Pzc4fSCWxuTQI/giphy.gif");
+        gifList.add("https://media.giphy.com/media/oLWXdNKNlMdS8/giphy.gif");
+
+        return new GifAdapterWithNetwork(this, gifList);
+    }
 
 //    private void initViewWithCustomView() {
 //        setContentView(R.layout.activity_main);

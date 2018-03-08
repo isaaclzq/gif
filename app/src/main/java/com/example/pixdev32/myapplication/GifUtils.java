@@ -68,8 +68,6 @@ public class GifUtils {
         delay = -1;
         if ((n >= 0) && (n < frameCount)) {
             delay = frames.elementAt(n).delay;
-        } else {
-            Log.v("aldsfj", "a;sdfjasdf");
         }
         return delay;
     }
