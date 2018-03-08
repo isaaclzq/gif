@@ -2,8 +2,10 @@ package com.example.pixdev32.myapplication;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.util.LruCache;
+import android.util.Pair;
 
 import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.MultiCallback;
 
 /**
  * Created by pixdev32 on 3/7/18.
@@ -14,7 +16,7 @@ public class GifCache {
     public static GifCache mCache;
     private static final Object lock = new Object();
 
-    private LruCache<String, GifDrawable> mLru;
+    private LruCache<String, Pair<GifDrawable, MultiCallback>> mLru;
     public static final int CACHE_SIZE = 1024 * 1024;
 
     private GifCache(){
@@ -38,15 +40,15 @@ public class GifCache {
         return mCache;
     }
 
-    public GifDrawable get(String key) {
+    public Pair<GifDrawable, MultiCallback> get(String key) {
 
         return mLru.get(key);
 
     }
 
-    public GifDrawable put(String key, GifDrawable animationDrawable) {
+    public Pair<GifDrawable, MultiCallback> put(String key, Pair<GifDrawable, MultiCallback> value) {
 
-        return mLru.put(key, animationDrawable);
+        return mLru.put(key, value);
 
     }
 

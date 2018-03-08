@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.LruCache;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,6 +32,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
+import pl.droidsonroids.gif.MultiCallback;
 
 /**
  * Created by pixdev32 on 3/6/18.
@@ -49,7 +51,6 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
     public GifAdapterWithNetwork(Context context, List list) {
         mContext = context;
         mList = list;
-
 //        mCache = initCache();
     }
 
@@ -94,7 +95,7 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
 
         }
 
-        public class GifAsync extends AsyncTask<String, Void, GifDrawable> {
+        public class GifAsync extends AsyncTask<String, Void, Pair<GifDrawable, MultiCallback>> {
 
             private GifImageView view;
             private Context mContext;
@@ -106,17 +107,19 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
             }
 
             @Override
-            protected void onPostExecute(GifDrawable file) {
+            protected void onPostExecute(Pair<GifDrawable, MultiCallback> file) {
                 if (file == null) {
                     return;
                 }
-                view.setBackground(file);
-                file.start();
+                view.setBackground(file.first);
+                file.second.addView(view);
+                file.first.setCallback(file.second);
+//                file.start();
                 super.onPostExecute(file);
             }
 
             @Override
-            protected GifDrawable doInBackground(String... strings) {
+            protected Pair<GifDrawable, MultiCallback> doInBackground(String... strings) {
                 String str = strings[0];
                 String filename = "1";
                 try {
@@ -127,11 +130,11 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                 File file = null;
                 FileInputStream fis = null;
                 GifDrawable drawable;
+                Pair<GifDrawable, MultiCallback> tmpPair = null;
+                tmpPair = GifCache.getInstance().get(filename);
 
-                drawable = GifCache.getInstance().get(filename);
-
-                if (drawable != null) {
-                    return drawable;
+                if (tmpPair != null) {
+                    return tmpPair;
                 }
 
                 file = new File(mContext.getCacheDir(), filename);
@@ -140,8 +143,9 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
 
                     try {
                         drawable = new GifDrawable(file);
-                        GifCache.getInstance().put(filename, drawable);
-                        return drawable;
+                        tmpPair = new Pair<>(drawable, new MultiCallback());
+                        GifCache.getInstance().put(filename, tmpPair);
+                        return tmpPair;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -165,7 +169,8 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                         }
 
                         drawable = new GifDrawable(file);
-                        GifCache.getInstance().put(filename, drawable);
+                        tmpPair = new Pair<>(drawable, new MultiCallback());
+                        GifCache.getInstance().put(filename, tmpPair);
 
                         mOutput.flush();
                     } finally {
@@ -177,8 +182,7 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                return drawable;
+                return tmpPair;
             }
 
         }
