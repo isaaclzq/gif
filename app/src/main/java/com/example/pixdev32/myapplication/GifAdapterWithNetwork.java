@@ -89,9 +89,10 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
         public void bind(String str) {
             Log.v("adapter", "onbind");
 //            mGif7.setCache(mCache);
-            new GifAsync(mContext, mGif7).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, str);
-
-
+            GifAsync gifAsync =  new GifAsync(mContext, mGif7);
+            mGif7.setTag(gifAsync);
+//            gifAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, str);
+            gifAsync.execute(str);
         }
 
         public class GifAsync extends AsyncTask<String, Void, GifDrawable> {
@@ -110,6 +111,10 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                 if (file == null) {
                     return;
                 }
+                if(view.getTag() != this){
+                    Log.d("postExecute", "Wrong async");
+                    return;
+                }
                 view.setBackground(file);
                 file.start();
                 super.onPostExecute(file);
@@ -117,6 +122,10 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
 
             @Override
             protected GifDrawable doInBackground(String... strings) {
+                if(view.getTag() != this){
+                    Log.d("postExecute", "Wrong async");
+                    return null;
+                }
                 String str = strings[0];
                 String filename = "1";
                 try {
