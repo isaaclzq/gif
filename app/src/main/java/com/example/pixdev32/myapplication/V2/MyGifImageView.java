@@ -147,6 +147,7 @@ public class MyGifImageView extends GifImageView {
                     UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            setBackground(null);
                             setImageBitmap(drawable.getCurrentFrame());
                             invalidate();
                         }
