@@ -71,7 +71,7 @@ public class GifAdapterV2 extends RecyclerView.Adapter<GifAdapterV2.GifViewHolde
         @Override
         public void onClick(View v) {
             mGif8.setImageDrawable(null);
-            mGif8.setResource((String) itemView.getTag(), url);
+            mGif8.play();
         }
     }
 

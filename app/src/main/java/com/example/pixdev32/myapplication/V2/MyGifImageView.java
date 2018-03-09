@@ -22,6 +22,7 @@ public class MyGifImageView extends GifImageView {
     private Context mContext;
     private Handler UIHandler;
     private GifDownloader.OnDownloadCompleteListener listener;
+    private GifDrawable mDrawable;
 
     private final int MAX_HEIGHT = 300;
     private final int MAX_WIDTH = 0;
@@ -48,6 +49,14 @@ public class MyGifImageView extends GifImageView {
         super(context, attrs, defStyle, defStyleRes);
         mContext = context;
         initCallback();
+    }
+
+    public void play() {
+        if (mDrawable != null) {
+            setImageDrawable(mDrawable);
+            invalidate();
+            requestLayout();
+        }
     }
 
     @Override
@@ -134,6 +143,7 @@ public class MyGifImageView extends GifImageView {
                 }
                 try {
                     final GifDrawable drawable = new GifDrawable(file);
+                    mDrawable = drawable;
                     UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
