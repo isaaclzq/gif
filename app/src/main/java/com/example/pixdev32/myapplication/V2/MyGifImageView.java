@@ -1,4 +1,4 @@
-package com.example.pixdev32.myapplication;
+package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
 import android.os.Handler;
@@ -68,9 +68,9 @@ public class MyGifImageView extends GifImageView {
         UIHandler = new Handler(mContext.getMainLooper());
     }
 
-    public void setResource(String url) {
+    public void setResource(String viewID, String url) {
 
-        GifDownloader.getInstance(mContext).download(url, listener);
+        GifDownloader.getInstance(mContext).download(viewID, url, listener);
 
     }
 

@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical">
 
-    <com.example.pixdev32.myapplication.MyGifImageView
+    <com.example.pixdev32.myapplication.V2.MyGifImageView
         android:id="@+id/img_gif8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

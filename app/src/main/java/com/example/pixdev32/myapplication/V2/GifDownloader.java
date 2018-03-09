@@ -1,11 +1,7 @@
-package com.example.pixdev32.myapplication;
+package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.util.Pair;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,14 +13,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import pl.droidsonroids.gif.GifDrawable;
-import pl.droidsonroids.gif.MultiCallback;
 
 /**
  * Created by pixdev32 on 3/8/18.
@@ -32,16 +27,24 @@ import pl.droidsonroids.gif.MultiCallback;
 
 public class GifDownloader {
 
+    // singleton downloader
     private static GifDownloader downloader;
+
+    // lock
     private static final Object lock = new Object();
+
+    // cache for preventing downloading the same file
     private LinkedHashSet<String> mCache;
     private Context mContext;
+
+    // thread pool information
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private final BlockingQueue<Runnable> mWorkQueue;
-
     private ThreadPoolExecutor threadPoolExecutor;
+
+    private LinkedHashMap<String, Future> table;
 
     private GifDownloader(Context context) {
         mCache = new LinkedHashSet<>();
@@ -54,12 +57,18 @@ public class GifDownloader {
                 KEEP_ALIVE_TIME_UNIT,
                 mWorkQueue
         );
+        table = new LinkedHashMap<>();
     }
 
     public interface OnDownloadCompleteListener {
         void onDownloadComplete(File file);
     }
 
+    /**
+     * retrieve the global file downloader
+     * @param context
+     * @return downloader (singleton)
+     */
     public static GifDownloader getInstance(Context context) {
 
         if (downloader != null) {
@@ -75,7 +84,22 @@ public class GifDownloader {
         return downloader;
     }
 
-    public void download(final String url, final OnDownloadCompleteListener listener) {
+    public void cancel(String viewID) {
+        Future future = table.get(viewID);
+        if (future == null) {
+            return;
+        }
+        if (future.isDone() || future.isCancelled()) {
+            future.cancel(true);
+        }
+    }
+
+    /**
+     * download (or retrieve) file
+     * @param url file url
+     * @param listener post execution (given the downloaded file)
+     */
+    public void download(String viewID, final String url, final OnDownloadCompleteListener listener) {
 
         boolean exist = mCache.contains(url);
         String filename = "temporary";
@@ -84,9 +108,7 @@ public class GifDownloader {
             return;
         }
 
-
-
-        threadPoolExecutor.execute(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 // gif has been downloaded
@@ -130,10 +152,22 @@ public class GifDownloader {
                     mCache.remove(url);
                 }
             }
-        });
+        };
+
+        cancel(viewID);
+
+        table.put(viewID, threadPoolExecutor.submit(runnable));
+
+        threadPoolExecutor.execute(runnable);
 
     }
 
+    /**
+     * check if the file has been downloaded
+     * @param url url (can transform to filename)
+     * @param listener
+     * @return
+     */
     private boolean checkLocal(String url, OnDownloadCompleteListener listener) {
 
         File file = null;

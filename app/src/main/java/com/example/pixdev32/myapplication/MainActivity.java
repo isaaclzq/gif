@@ -4,6 +4,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import com.example.pixdev32.myapplication.V2.GifAdapterV2;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;

@@ -1,11 +1,16 @@
-package com.example.pixdev32.myapplication;
+package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.pixdev32.myapplication.R;
+
 import java.util.List;
+import java.util.UUID;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -49,10 +54,11 @@ public class GifAdapterV2 extends RecyclerView.Adapter<GifAdapterV2.GifViewHolde
         public GifViewHolderV2(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setTag(UUID.randomUUID().toString());
         }
 
         public void bind(String url) {
-            mGif8.setResource(url);
+            mGif8.setResource((String) itemView.getTag(), url);
         }
     }
 
