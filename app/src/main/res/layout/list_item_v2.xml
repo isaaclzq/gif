@@ -10,6 +10,7 @@
     <com.example.pixdev32.myapplication.V2.MyGifImageView
         android:id="@+id/img_gif8"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_launcher_foreground"/>
 </LinearLayout>
 

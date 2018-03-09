@@ -56,7 +56,7 @@ public class MyGifImageView extends GifImageView {
                     UIHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            setBackground(drawable);
+                            setImageDrawable(drawable);
                             invalidate();
                         }
                     });
@@ -71,6 +71,31 @@ public class MyGifImageView extends GifImageView {
     public void setResource(String viewID, String url) {
 
         GifDownloader.getInstance(mContext).download(viewID, url, listener);
+
+    }
+
+    public void setImage(String viewID, String url) {
+
+        GifDownloader.getInstance(mContext).download(viewID, url, new GifDownloader.OnDownloadCompleteListener() {
+            @Override
+            public void onDownloadComplete(File file) {
+                if (file == null) {
+                    return;
+                }
+                try {
+                    final GifDrawable drawable = new GifDrawable(file);
+                    UIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setImageBitmap(drawable.getCurrentFrame());
+                            invalidate();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 

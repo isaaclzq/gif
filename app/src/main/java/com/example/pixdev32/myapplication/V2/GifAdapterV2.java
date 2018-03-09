@@ -1,6 +1,7 @@
 package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.example.pixdev32.myapplication.R;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,18 +48,29 @@ public class GifAdapterV2 extends RecyclerView.Adapter<GifAdapterV2.GifViewHolde
         return mList.size();
     }
 
-    public class GifViewHolderV2 extends RecyclerView.ViewHolder {
+    public class GifViewHolderV2 extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.img_gif8)
         MyGifImageView mGif8;
+
+        String url = null;
 
         public GifViewHolderV2(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setTag(UUID.randomUUID().toString());
+            itemView.setOnClickListener(this);
         }
 
         public void bind(String url) {
+            this.url = url;
+            mGif8.setImageDrawable(null);
+            mGif8.setImage((String) itemView.getTag(), url);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mGif8.setImageDrawable(null);
             mGif8.setResource((String) itemView.getTag(), url);
         }
     }

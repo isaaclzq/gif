@@ -95,9 +95,7 @@ public class GifDownloader {
             return;
         }
         if (!future.isDone() && !future.isCancelled()) {
-            Log.v("cancel", "before: size = " + mWorkQueue.size());
-            boolean status = future.cancel(true);
-            Log.v("cancel", "after: size = " + mWorkQueue.size() + ' ' + status);
+            future.cancel(false);
         }
     }
 
