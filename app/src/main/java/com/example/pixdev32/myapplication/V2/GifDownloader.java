@@ -2,6 +2,7 @@ package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.LruCache;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,14 +39,16 @@ public class GifDownloader {
     private Context mContext;
 
     // thread pool information
-//    private static int NUMBER_OF_CORES = 1;
-    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+    private static int NUMBER_OF_CORES = 4;
+//    private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private final BlockingQueue<Runnable> mWorkQueue;
     private ThreadPoolExecutor threadPoolExecutor;
 
     private LinkedHashMap<String, Future> table;
+
+    private LruCache<String, File> fileCache;
 
     private GifDownloader(Context context) {
         mCache = new LinkedHashSet<>();
@@ -59,6 +62,7 @@ public class GifDownloader {
                 mWorkQueue
         );
         table = new LinkedHashMap<>();
+        fileCache = new LruCache<>(128 * 1024);
     }
 
     public interface OnDownloadCompleteListener {
@@ -183,13 +187,19 @@ public class GifDownloader {
             e.printStackTrace();
         }
 
-        file = new File(mContext.getCacheDir(), filename);
+        file = fileCache.get(filename);
 
-        if (file.exists()) {
-            listener.onDownloadComplete(file);
-            return true;
+        if (file == null) {
+            file = new File(mContext.getCacheDir(), filename);
+            if (file.exists()) {
+                fileCache.put(filename, file);
+                listener.onDownloadComplete(file);
+                return true;
+            }
+            return false;
         }
 
-        return false;
+        listener.onDownloadComplete(file);
+        return true;
     }
 }
