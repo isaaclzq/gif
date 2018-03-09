@@ -112,8 +112,8 @@ public class GifAdapterWithNetwork extends RecyclerView.Adapter<GifAdapterWithNe
                     return;
                 }
                 view.setBackground(file.first);
-                file.second.addView(view);
-                file.first.setCallback(file.second);
+//                file.second.addView(view);
+//                file.first.setCallback(file.second);
 //                file.start();
                 super.onPostExecute(file);
             }

@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        mRecycler.setAdapter(getAdapterForNetworkGif());
+//        mRecycler.setAdapter(getAdapterForNetworkGif());
+        mRecycler.setAdapter(getAdapterV2());
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 //        initViewWithGifDecoder();
 
@@ -106,6 +107,33 @@ public class MainActivity extends AppCompatActivity {
         gifList.add("https://media.giphy.com/media/oLWXdNKNlMdS8/giphy.gif");
 
         return new GifAdapterWithNetwork(this, gifList);
+    }
+
+    private GifAdapterV2 getAdapterV2() {
+        gifList = new ArrayList<>();
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
+        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
+        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
+
+
+        gifList.add("https://media.giphy.com/media/k2RYhEjB9THm8/giphy.gif");
+        gifList.add("https://media.giphy.com/media/S0SRH7in45I4w/giphy.gif");
+        gifList.add("https://media.giphy.com/media/DQ7UyAWFlHNVm/giphy.gif");
+        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
+        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
+        gifList.add("https://media.giphy.com/media/Pzc4fSCWxuTQI/giphy.gif");
+        gifList.add("https://media.giphy.com/media/oLWXdNKNlMdS8/giphy.gif");
+
+        return new GifAdapterV2(this, gifList);
     }
 
 //    private void initViewWithCustomView() {
