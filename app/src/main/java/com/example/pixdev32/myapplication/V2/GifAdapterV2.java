@@ -65,7 +65,7 @@ public class GifAdapterV2 extends RecyclerView.Adapter<GifAdapterV2.GifViewHolde
         public void bind(String url) {
             this.url = url;
             mGif8.setImageDrawable(null);
-            mGif8.setBackground(mContext.getDrawable(R.drawable.placeholder));
+//            mGif8.setBackground(mContext.getDrawable(R.drawable.placeholder));
             mGif8.setImage((String) itemView.getTag(), url);
         }
 
