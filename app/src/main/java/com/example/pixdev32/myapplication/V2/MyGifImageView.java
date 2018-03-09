@@ -1,8 +1,11 @@
 package com.example.pixdev32.myapplication.V2;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.icu.util.Measure;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +22,9 @@ public class MyGifImageView extends GifImageView {
     private Context mContext;
     private Handler UIHandler;
     private GifDownloader.OnDownloadCompleteListener listener;
+
+    private final int MAX_HEIGHT = 300;
+    private final int MAX_WIDTH = 0;
 
     public MyGifImageView(Context context) {
         super(context);
@@ -44,6 +50,49 @@ public class MyGifImageView extends GifImageView {
         initCallback();
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        Drawable gifDrawable = getDrawable();
+        if(!(getDrawable() instanceof GifDrawable)){
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+//        switch(widthMode){
+//            case MeasureSpec.AT_MOST:
+//                break;
+//            case MeasureSpec.EXACTLY:
+//                break;
+//            case MeasureSpec.UNSPECIFIED:
+//                break;
+//        }
+
+        switch (heightMode){
+            case MeasureSpec.AT_MOST:
+                break;
+            case MeasureSpec.EXACTLY:
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                if(gifDrawable != null){
+                    int ratio = (((GifDrawable)gifDrawable).getCurrentFrame().getWidth() / (((GifDrawable)gifDrawable).getCurrentFrame().getHeight()));
+                    if(ratio > 0)
+                        height = width * 1 / ((((GifDrawable)gifDrawable).getCurrentFrame().getWidth() / (((GifDrawable)gifDrawable).getCurrentFrame().getHeight())));
+                }
+                if(height == 0) height = MAX_HEIGHT;
+                break;
+        }
+
+        Log.d("OnMeasure", "W: " + width + ", H: " + height);
+        setMeasuredDimension(width, height);
+
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
     private void initCallback() {
         listener = new GifDownloader.OnDownloadCompleteListener() {
             @Override
@@ -58,6 +107,7 @@ public class MyGifImageView extends GifImageView {
                         public void run() {
                             setImageDrawable(drawable);
                             invalidate();
+                            requestLayout();
                         }
                     });
                 } catch (IOException e) {
