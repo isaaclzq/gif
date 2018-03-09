@@ -38,6 +38,7 @@ public class GifDownloader {
     private Context mContext;
 
     // thread pool information
+//    private static int NUMBER_OF_CORES = 1;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
     private static final int KEEP_ALIVE_TIME = 1;
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
@@ -89,8 +90,10 @@ public class GifDownloader {
         if (future == null) {
             return;
         }
-        if (future.isDone() || future.isCancelled()) {
-            future.cancel(true);
+        if (!future.isDone() && !future.isCancelled()) {
+            Log.v("cancel", "before: size = " + mWorkQueue.size());
+            boolean status = future.cancel(true);
+            Log.v("cancel", "after: size = " + mWorkQueue.size() + ' ' + status);
         }
     }
 

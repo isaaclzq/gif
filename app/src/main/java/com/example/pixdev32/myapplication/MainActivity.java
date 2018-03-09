@@ -1,5 +1,6 @@
 package com.example.pixdev32.myapplication;
 
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import com.example.pixdev32.myapplication.V2.GifAdapterV2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView mRecycler;
 
     private Unbinder mUnbinder;
-    private ArrayList gifList;
+    private List gifList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,28 +116,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private GifAdapterV2 getAdapterV2() {
-        gifList = new ArrayList<>();
-        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
-        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
-        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
-        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
-        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
-        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
-        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
-        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
-        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
-        gifList.add("https://media.giphy.com/media/CyRC2jhUo6nDy/giphy.gif");
-        gifList.add("https://media.giphy.com/media/3o6ZtiqckeZGMHITQY/giphy.gif");
-        gifList.add("https://media.giphy.com/media/OsOP6zRwxrnji/giphy.gif");
-
-
-        gifList.add("https://media.giphy.com/media/k2RYhEjB9THm8/giphy.gif");
-        gifList.add("https://media.giphy.com/media/S0SRH7in45I4w/giphy.gif");
-        gifList.add("https://media.giphy.com/media/DQ7UyAWFlHNVm/giphy.gif");
-        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
-        gifList.add("https://media.giphy.com/media/mlG1xkRbsubK/giphy.gif");
-        gifList.add("https://media.giphy.com/media/Pzc4fSCWxuTQI/giphy.gif");
-        gifList.add("https://media.giphy.com/media/oLWXdNKNlMdS8/giphy.gif");
+        Resources res = getResources();
+        String[] urls = res.getStringArray(R.array.urls);
+        gifList = Arrays.asList(urls);
 
         return new GifAdapterV2(this, gifList);
     }
