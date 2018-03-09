@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.example.pixdev32.myapplication.V2.GifAdapterV2;
 
@@ -41,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.gif_recycler)
     RecyclerView mRecycler;
+
+    @BindView(R.id.gif_comment)
+    GifEditText editText;
+
+    @BindView(R.id.gif_post_btn)
+    ImageButton post;
 
     private Unbinder mUnbinder;
     private List gifList;

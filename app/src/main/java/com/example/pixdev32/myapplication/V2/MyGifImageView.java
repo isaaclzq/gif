@@ -61,6 +61,7 @@ public class MyGifImageView extends GifImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
@@ -90,7 +91,7 @@ public class MyGifImageView extends GifImageView {
                 if(gifDrawable != null){
                     int ratio = (((GifDrawable)gifDrawable).getCurrentFrame().getWidth() / (((GifDrawable)gifDrawable).getCurrentFrame().getHeight()));
                     if(ratio > 0)
-                        height = width * 1 / ((((GifDrawable)gifDrawable).getCurrentFrame().getWidth() / (((GifDrawable)gifDrawable).getCurrentFrame().getHeight())));
+                        height = width * 1 / ratio;
                 }
                 if(height == 0) height = MAX_HEIGHT;
                 break;
