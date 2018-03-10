@@ -17,6 +17,7 @@ import android.widget.EditText;
  */
 
 public class GifEditText extends android.support.v7.widget.AppCompatEditText {
+    GifUriListener listener;
     public GifEditText(Context context) {
         super(context);
     }
@@ -27,6 +28,10 @@ public class GifEditText extends android.support.v7.widget.AppCompatEditText {
 
     public GifEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    public void setListener(GifUriListener listener){
+        this.listener = listener;
     }
 
     @Override
@@ -53,11 +58,16 @@ public class GifEditText extends android.support.v7.widget.AppCompatEditText {
 
                         // read and display inputContentInfo asynchronously.
                         // call inputContentInfo.releasePermission() as needed.
-                        Uri uri =inputContentInfo.getLinkUri();
+                        Uri uri = inputContentInfo.getContentUri();
                         GifEditText.this.setText(uri.toString());
+                        listener.onGifUriLoaded(uri);
                         return true;  // return true if succeeded
                     }
                 };
         return InputConnectionCompat.createWrapper(ic, editorInfo, callback);
+    }
+
+    interface GifUriListener{
+        void onGifUriLoaded(Uri uri);
     }
 }

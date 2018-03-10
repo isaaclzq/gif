@@ -6,7 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/gif_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/gif_recycler">
+    </pl.droidsonroids.gif.GifImageView>
+
     <android.support.v7.widget.RecyclerView
+        android:visibility="gone"
         android:id="@+id/gif_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

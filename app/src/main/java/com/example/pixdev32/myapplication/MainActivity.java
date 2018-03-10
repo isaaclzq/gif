@@ -1,6 +1,7 @@
 package com.example.pixdev32.myapplication;
 
 import android.content.res.Resources;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,8 +18,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import pl.droidsonroids.gif.GifImageView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GifEditText.GifUriListener{
 
 //    @BindView(R.id.img_gif1)
 //    ImageView mGif1;
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.gif_post_btn)
     ImageButton post;
 
+    @BindView(R.id.gif_text)
+    GifImageView gifImageView;
+
     private Unbinder mUnbinder;
     private List gifList;
 
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-
+        editText.setListener(this);
 
 //        mRecycler.setAdapter(getAdapterForNetworkGif());
         mRecycler.setAdapter(getAdapterV2());
@@ -152,5 +157,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         mUnbinder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    public void onGifUriLoaded(Uri uri) {
+        gifImageView.setImageURI(uri);
     }
 }
