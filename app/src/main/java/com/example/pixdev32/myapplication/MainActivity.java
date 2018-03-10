@@ -2,10 +2,13 @@ package com.example.pixdev32.myapplication;
 
 import android.content.res.Resources;
 import android.net.Uri;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -20,7 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import pl.droidsonroids.gif.GifImageView;
 
-public class MainActivity extends AppCompatActivity implements GifEditText.GifUriListener{
+public class MainActivity extends AppCompatActivity implements GifEditText.GifUriListener, View.OnClickListener{
 
 //    @BindView(R.id.img_gif1)
 //    ImageView mGif1;
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
 
     private Unbinder mUnbinder;
     private List gifList;
+    private RecyclerView.Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +69,15 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
+        adapter = getAdapterV2();
+        mRecycler.setAdapter(adapter);
         editText.setListener(this);
 
 //        mRecycler.setAdapter(getAdapterForNetworkGif());
         mRecycler.setAdapter(getAdapterV2());
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//        initViewWithGifDecoder();
 
-//        initViewWithCustomView();
-//        initViewWithGlide();
+        post.setOnClickListener(this);
     }
 
     private GifAdapter getAdapterForLocalGif() {
@@ -131,27 +135,10 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
     private GifAdapterV2 getAdapterV2() {
         Resources res = getResources();
         String[] urls = res.getStringArray(R.array.urls);
-        gifList = Arrays.asList(urls);
+        gifList = new ArrayList();
 
         return new GifAdapterV2(this, gifList);
     }
-
-//    private void initViewWithCustomView() {
-//        setContentView(R.layout.activity_main);
-//    }
-
-//    private void initViewWithGlide() {
-//        setContentView(R.layout.activity_gif);
-//
-//        mUnbinder = ButterKnife.bind(this);
-//
-//        Glide.with(this).load(R.drawable.clap).into(mGif1);
-//        Glide.with(this).load(R.drawable.shop).into(mGif2);
-//        Glide.with(this).load(R.drawable.tiger).into(mGif3);
-//        Glide.with(this).load(R.drawable.clap).into(mGif4);
-//        Glide.with(this).load(R.drawable.shop).into(mGif5);
-//        Glide.with(this).load(R.drawable.tiger).into(mGif6);
-//    }
 
     @Override
     protected void onDestroy() {
@@ -162,5 +149,18 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
     @Override
     public void onGifUriLoaded(Uri uri) {
         gifImageView.setImageURI(uri);
+    }
+
+    @Override
+    public void onClick(View v) {
+        String content = editText.getText().toString();
+        if (content == null || content.equals("")) {
+            return;
+        }
+
+        gifList.add(content);
+        adapter.notifyItemInserted(gifList.size()-1);
+
+        editText.setText("");
     }
 }
