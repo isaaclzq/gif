@@ -69,12 +69,13 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-        adapter = getAdapterV2();
+//        adapter = getAdapterV2();
+        adapter = getCommentAdapter();
         mRecycler.setAdapter(adapter);
         editText.setListener(this);
 
 //        mRecycler.setAdapter(getAdapterForNetworkGif());
-        mRecycler.setAdapter(getAdapterV2());
+//        mRecycler.setAdapter(getAdapterV2());
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         post.setOnClickListener(this);
@@ -140,6 +141,10 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
         return new GifAdapterV2(this, gifList);
     }
 
+    private GifCommentAdapter getCommentAdapter() {
+        return new GifCommentAdapter(new ArrayList<Uri>(), this);
+    }
+
     @Override
     protected void onDestroy() {
         mUnbinder.unbind();
@@ -148,7 +153,10 @@ public class MainActivity extends AppCompatActivity implements GifEditText.GifUr
 
     @Override
     public void onGifUriLoaded(Uri uri) {
-        gifImageView.setImageURI(uri);
+//        gifImageView.setImageURI(uri);
+        if(adapter instanceof GifCommentAdapter){
+            ((GifCommentAdapter) adapter).addUri(uri);
+        }
     }
 
     @Override

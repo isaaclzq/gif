@@ -1,5 +1,6 @@
 package com.example.pixdev32.myapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -59,8 +60,8 @@ public class GifEditText extends android.support.v7.widget.AppCompatEditText {
                         // read and display inputContentInfo asynchronously.
                         // call inputContentInfo.releasePermission() as needed.
                         Uri uri = inputContentInfo.getContentUri();
-                        GifEditText.this.setText(uri.toString());
-                        listener.onGifUriLoaded(uri);
+//                        GifEditText.this.setText(uri.toString());
+                        ((MainActivity)getContext()).onGifUriLoaded(uri);
                         return true;  // return true if succeeded
                     }
                 };
