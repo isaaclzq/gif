@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -18,28 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MainActivity extends AppCompatActivity {
-
-//    @BindView(R.id.img_gif1)
-//    ImageView mGif1;
-//
-//    @BindView(R.id.img_gif2)
-//    ImageView mGif2;
-//
-//    @BindView(R.id.img_gif3)
-//    ImageView mGif3;
-//
-//    @BindView(R.id.img_gif4)
-//    ImageView mGif4;
-//
-//    @BindView(R.id.img_gif5)
-//    ImageView mGif5;
-//
-//    @BindView(R.id.img_gif6)
-//    ImageView mGif6;
-
-//    @BindView(R.id.img_gif7)
-//    GifImageViewBase mGif7;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     @BindView(R.id.gif_recycler)
     RecyclerView mRecycler;
@@ -52,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Unbinder mUnbinder;
     private List gifList;
+    private RecyclerView.Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +41,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
 
-
-
-//        mRecycler.setAdapter(getAdapterForNetworkGif());
-        mRecycler.setAdapter(getAdapterV2());
+        adapter = getAdapterV2();
+        mRecycler.setAdapter(adapter);
         mRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//        initViewWithGifDecoder();
 
-//        initViewWithCustomView();
-//        initViewWithGlide();
+        post.setOnClickListener(this);
     }
 
     private GifAdapter getAdapterForLocalGif() {
@@ -126,31 +103,27 @@ public class MainActivity extends AppCompatActivity {
     private GifAdapterV2 getAdapterV2() {
         Resources res = getResources();
         String[] urls = res.getStringArray(R.array.urls);
-        gifList = Arrays.asList(urls);
+        gifList = new ArrayList();
 
         return new GifAdapterV2(this, gifList);
     }
-
-//    private void initViewWithCustomView() {
-//        setContentView(R.layout.activity_main);
-//    }
-
-//    private void initViewWithGlide() {
-//        setContentView(R.layout.activity_gif);
-//
-//        mUnbinder = ButterKnife.bind(this);
-//
-//        Glide.with(this).load(R.drawable.clap).into(mGif1);
-//        Glide.with(this).load(R.drawable.shop).into(mGif2);
-//        Glide.with(this).load(R.drawable.tiger).into(mGif3);
-//        Glide.with(this).load(R.drawable.clap).into(mGif4);
-//        Glide.with(this).load(R.drawable.shop).into(mGif5);
-//        Glide.with(this).load(R.drawable.tiger).into(mGif6);
-//    }
 
     @Override
     protected void onDestroy() {
         mUnbinder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View v) {
+        String content = editText.getText().toString();
+        if (content == null || content.equals("")) {
+            return;
+        }
+
+        gifList.add(content);
+        adapter.notifyItemInserted(gifList.size()-1);
+
+        editText.setText("");
     }
 }
